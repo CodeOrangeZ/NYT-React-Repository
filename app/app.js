@@ -1,8 +1,5 @@
-import React from "react";
-import ReactDOM from "react-dom";
-import Routes from './routes';
-
-ReactDOM.render(
-  <Routes />,
-  document.getElementById("app")
-);
+//nytreact
+const React = require('react');
+var ReactDOM = require('react-dom');
+var Main = require('./components/Main');
+ReactDOM.render(<Main/> , document.getElementById('app'));

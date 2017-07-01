@@ -1,21 +1,26 @@
-/* ************************************************************************ */
-/*
-    Issue Schema - The publication issue obtained from the scraped data                                   
-*/
-var mongoose = require('mongoose');
-var Schema = mongoose.Schema;
+const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
 
-var articleSchema= new Schema({
-    headline: String,
-    byline: String,
-    sectionName: String,
-    pubDate: String, 
-    webURL: String,
-    dateSaved: {type: Date, default: Date.now},
-    deleted: {type: Boolean, default: false}
+var ArticleSchema = new Schema({
+  title: {
+    type: String,
+    required: true,
+    unique: true
+  },
+
+  url: {
+    type: String,
+    required: true
+  },
+
+  author: {
+    type: String,
+    required: true
+  },
+
+  abstract: {
+    type: String
+  }
 });
 
-var ArticleModel = mongoose.model('Article',articleSchema);
-
-module.exports=ArticleModel; 
-
+module.exports = mongoose.model("Article", ArticleSchema);

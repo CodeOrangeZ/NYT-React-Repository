@@ -1,66 +1,90 @@
-import React, { Component } from "react";
-import { Link } from "react-router-dom";
-import Search from "./Search";
-import Bookmarks from "./Bookmarks";
+const React = require('react');
 
-export default class Main extends Component {
+//include children components
+var SavedArticleList = require('./saved/SavedArticleList');
+var ResultArticleList = require('./results/ResultArticleList');
+var Search = require('./search/Search');
+var helpers = require('../utils/helpers');
+
+
+class Main extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      resultArray: [],
+      savedArray: []
+    }
+
+    this.setResultArray = this.setResultArray.bind(this);
+    this.setSavedArray = this.setSavedArray.bind(this);
+    this.saveArticle = this.saveArticle.bind(this);
+    this.deleteArticle = this.deleteArticle.bind(this);
+  }
+
+  setResultArray(resultArray) {
+    this.setState(Object.assign({}, this.state, {resultArray: resultArray}));
+  }
+
+  setSavedArray(savedArray) {
+    this.setState(Object.assign({}, this.state, {savedArray: savedArray}));
+  }
+
+  saveArticle(article) {
+    helpers.saveArticle(article).then((response) => {
+      console.log(response);
+        this.setState({
+          savedArray: response.data
+        })//this.setState(Object.assign({}, this.state, {savedArray:  newArray}));
+    });
+  }
+
+  deleteArticle(article) {
+    helpers.removeArticle(article).then((response) => {
+      this.setState({
+        savedArray: response.data
+      })
+    });//this.setState({savedArray: newSavedArray});
+  }
+
+  //maybe move to child components
+  // componentDidUpdate: function(prevProps, prevState) {
+  //   console.log(this.state, '\n', prevState);
+  //   console.log(JSON.stringify(this.state.savedArray) !== JSON.stringify(prevState.savedArray));
+  //   if(this.state !== prevState) return;
+  //   helpers.getSavedArticles().then((response) => {
+  //     let saved = response.data.length
+  //               ? response.data
+  //               : [];
+  //     this.setState({
+  //       savedArray: saved
+  //     });
+  //   });
+  // },
+
+  componentDidMount() {
+    helpers.getSavedArticles().then((response) => {
+      let saved = response.data.length
+                ? response.data
+                : [];
+      this.setState({
+        savedArray: saved
+      });
+    });
+  }
+
   render() {
     return (
-      <main className="container">
-
-        {/* Navbar */}
-        <nav className="navbar navbar-default" role="navigation">
-          <div className="container-fluid">
-            <div className="navbar-header">
-              <button
-                type="button"
-                className="navbar-toggle"
-                data-toggle="collapse"
-                data-target=".navbar-ex1-collapse"
-                >
-                <span className="sr-only">Toggle navigation</span>
-                <span className="icon-bar"></span>
-                <span className="icon-bar"></span>
-                <span className="icon-bar"></span>
-              </button>
-              <Link className="navbar-brand" to="/">NYT Article Scrubber</Link>
-            </div>
-            <div className="collapse navbar-collapse navbar-ex1-collapse">
-              <ul className="nav navbar-nav navbar-right">
-                <li>
-                  <Link to="/search">
-                    <i className="fa fa-search" aria-hidden="true"></i>&nbsp;
-                    Search
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/bookmarks">
-                    <i className="fa fa-bookmark" aria-hidden="true"></i>&nbsp;
-                    Bookmarks
-                  </Link>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </nav>
-
-        {/* Jumbotron */}
-        <div className="jumbotron text-center">
-          <h3><em>Search for and save news articles of interest</em></h3>
-        </div>
-
-        {/* Children Components */}
-        {this.props.children}
-
-        {/* Footer */}
-        <footer>
-          <hr />
-          <p className="text-center">
-            Zackery &copy; 2016. All Rights Reserved.
-          </p>
-        </footer>
-
-      </main>
-    );
+      <section className="container">
+        <Search setResultArray={this.setResultArray}/>
+        <ResultArticleList
+          resultArray={this.state.resultArray}
+          saveArticle={this.saveArticle}/>
+        <SavedArticleList
+          savedArray={this.state.savedArray}
+          deleteArticle={this.deleteArticle}/>
+      </section>
+    )
   }
-}
+};
+
+module.exports = Main;
